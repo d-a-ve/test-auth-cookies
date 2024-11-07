@@ -123,7 +123,6 @@ mainApiClient.interceptors.response.use(
 
 					return apiClientWithoutInterceptors(failedRequest);
 				} catch (e: any) {
-					console.log("Response error", e);
 					// ONE MIGHT WANT TO SEND A GENERIC ERROR TO THE USER IF ANY FAILS
 					return Promise.reject(e);
 				}
@@ -167,7 +166,6 @@ export const callApi = async <TRes>(
 		};
 	} catch (e: unknown) {
 		if (isAxiosError(e)) {
-			console.log(e);
 			return {
 				status: "error",
 				error: e.response ? e.response.data.message : e.message,
