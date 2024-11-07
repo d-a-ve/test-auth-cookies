@@ -5,7 +5,7 @@ import { callApi } from "@/services/base.service";
 import { User } from "@/types";
 import { X } from "lucide-react";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 export default function Login() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -15,12 +15,15 @@ export default function Login() {
 		auth: string | null;
 	}>({ user: null, auth: null });
 	const [dummyUser, setDummyUser] = useState<User | null>(null);
+	const formRef = useRef<HTMLFormElement>(null);
 
-  const router = useRouter();
+	const router = useRouter();
 
 	const getDummyUser = async () => {
+		formRef.current?.reset();
+
 		setIsDummyUserLoading(true);
-    setErrorMsg((prev) => ({ ...prev, user: null }));
+		setErrorMsg((prev) => ({ ...prev, user: null }));
 
 		const id = generateRandomIdWithinRange();
 		const { status, data, error } = await callApi<User>(`/users/${id}`, "GET");
@@ -45,19 +48,18 @@ export default function Login() {
 		const data = {
 			username: formData.get("username")!.toString(),
 			password: formData.get("password")!.toString(),
-      expiresInMins: 2,
+			expiresInMins: 2,
 		};
 
-		const {
-			status,
-			data: response,
-			error,
-		} = await callApi("/auth/login", "POST", data);
+		const { status, error } = await callApi("/auth/login", "POST", data);
 
 		setIsLoading(false);
 
-		if (error) setErrorMsg((prev) => ({ ...prev, auth: error }));
-		router.push('/?from=login')
+		if (status === "error") {
+			return setErrorMsg((prev) => ({ ...prev, auth: error }));
+		}
+
+		router.push("/?from=login");
 	};
 
 	return (
@@ -88,7 +90,8 @@ export default function Login() {
 			</div>
 			<form
 				className="w-[min(100%,_480px)] mx-auto space-y-4"
-				onSubmit={submit}>
+				onSubmit={submit}
+				ref={formRef}>
 				<div className="space-y-2">
 					<label htmlFor="username">Username</label>
 					<Input

@@ -11,6 +11,8 @@ export default function Home() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const router = useRouter();
+	// do not do this ever
+	// Just a quick hack to show that the user logged in from the login page
 	const hasSignedIn = router.query["from"] === "login";
 
 	const fetchCurrentUser = async () => {
@@ -30,9 +32,7 @@ export default function Home() {
 	};
 
 	useEffect(() => {
-		if (hasSignedIn) {
-			fetchCurrentUser();
-		}
+		fetchCurrentUser();
 	}, []);
 
 	return (
@@ -63,37 +63,33 @@ export default function Home() {
 				<LinkButton href="/login">Login</LinkButton>
 			</div>
 
-			{hasSignedIn && (
-				<>
-					<Button
-						variant={"secondary"}
-						onClick={fetchCurrentUser}
-						className="mt-4"
-						isLoading={isLoading}>
-						Refetch user details
-					</Button>
-					{errorMsg && (
-						<div className="bg-red-200 text-red-500 rounded-md py-1.5 text-sm px-3 flex justify-between items-start gap-4">
-							<p>{errorMsg}</p>
-							<button
-								className="p-0.5 rounded-sm hover:bg-red-300 duration-100"
-								onClick={() => {
-									setErrorMsg(null);
-								}}>
-								<X size={16} />
-							</button>
-						</div>
-					)}{" "}
-					{user && (
-						<div className="bg-white rounded-md p-4 shadow-md">
-							<h2 className="text-lg font-bold">User Details</h2>
-							<p className="text-sm">Name: {user.firstName}</p>
-							<p className="text-sm">Email: {user.email}</p>
-							<p className="text-sm">Username: {user.username}</p>
-							<p className="text-sm">Age: {user.age}</p>
-						</div>
-					)}
-				</>
+			<Button
+				variant={"secondary"}
+				onClick={fetchCurrentUser}
+				className="mt-4"
+				isLoading={isLoading}>
+				Refetch user details
+			</Button>
+			{errorMsg && (
+				<div className="bg-red-200 text-red-500 rounded-md py-1.5 text-sm px-3 flex justify-between items-start gap-4">
+					<p>{hasSignedIn ? errorMsg : "Please login to see user details"}</p>
+					<button
+						className="p-0.5 rounded-sm hover:bg-red-300 duration-100"
+						onClick={() => {
+							setErrorMsg(null);
+						}}>
+						<X size={16} />
+					</button>
+				</div>
+			)}
+			{user && (
+				<div className="bg-white rounded-md p-4 shadow-md">
+					<h2 className="text-lg font-bold">User Details</h2>
+					<p className="text-sm">Name: {user.firstName}</p>
+					<p className="text-sm">Email: {user.email}</p>
+					<p className="text-sm">Username: {user.username}</p>
+					<p className="text-sm">Age: {user.age}</p>
+				</div>
 			)}
 		</div>
 	);
